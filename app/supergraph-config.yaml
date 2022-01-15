@@ -1,0 +1,5 @@
+subgraphs:
+  userMeta:
+    routing_url: https://test-strata2-api.cirrus-connect.com/user-meta/graphql
+    schema:
+      subgraph_url: https://test-strata2-api.cirrus-connect.com/user-meta/graphql
