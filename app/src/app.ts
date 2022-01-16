@@ -17,6 +17,20 @@ app
   .use(express.json())
   .use(express.urlencoded({ extended: true }))
   .use(ignoreFavIcon)
-  .use(morgan(':method :url :status :res[content-length] - :response-time ms'));
+  .use(
+    morgan(':method :url :status :res[content-length] - :response-time ms', {
+      skip: (req) => {
+        if (
+          ['/graphql'].some(
+            (subString) => subString.toLowerCase() === req.originalUrl?.toLowerCase()
+          )
+        ) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+    })
+  );
 
 export default app;
