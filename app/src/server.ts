@@ -10,34 +10,31 @@ import NotFound from './middleware/notFound';
 import PingzRouter from './services/pingz/pingz.router';
 import ApiDocsRouter from './services/ApiDocs/ApiDocs.router';
 
-// Apollo Gateway
-import { ApolloServer } from 'apollo-server';
-import { ApolloGateway } from '@apollo/gateway';
-import { readFileSync } from 'fs';
-
-const supergraphSdl = readFileSync('./supergraph.graphql').toString();
-
-const gateway = new ApolloGateway({
-  supergraphSdl,
-  __exposeQueryPlanExperimental: true,
-});
-
-const server = new ApolloServer({
-  gateway,
-});
+import server from './lib/graph';
 
 app.use('/api-docs', ApiDocsRouter).use('/pingz', PingzRouter);
 
-// Final middleware
-app.use(NotFound).use(ErrorHandler);
+server
+  .start()
+  .then(() => {
+    console.log('started server');
 
-server.listen().catch((err) => {
-  console.error(err);
-});
+    server.applyMiddleware({ app });
 
-app.listen(config.hosting.port, (): void => {
-  console.log(`Success`);
-  client.trackEvent({
-    name: `start ${config.hosting.serviceName}`,
+    // Final middleware
+    app.use(NotFound).use(ErrorHandler);
+
+    app.listen({ port: config.hosting.port }, () => {
+      console.log(
+        `Now browse to http://localhost:${config.hosting.port}` +
+          server.graphqlPath
+      );
+      client.trackEvent({
+        name: 'start service',
+      });
+    });
+    return null;
+  })
+  .catch((error) => {
+    console.log('error server: ', error);
   });
-});

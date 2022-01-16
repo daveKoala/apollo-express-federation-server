@@ -1,5 +1,5 @@
-import config from "../configManager";
-import AppInsight = require("applicationinsights");
+import config from '../configManager';
+import AppInsight = require('applicationinsights');
 
 // https://docs.microsoft.com/en-us/azure/azure-monitor/app/api-custom-events-metrics
 
@@ -17,7 +17,7 @@ function removeStackTracesForHealthEndPoints(
   const data = envelope.data.baseData;
   if (
     data?.url &&
-    ["/pingz", "favicon"].some(
+    ['/pingz', 'favicon', '/graphql'].some(
       (subString) => subString.toLowerCase() === data?.url.toLowerCase()
     )
   ) {
