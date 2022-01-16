@@ -19,7 +19,8 @@
   "author": "",
   "license": "ISC",
   "engines": {
-    "node": "16"
+    "node": "16",
+    "npm": ">=7 <9"
   },
   "devDependencies": {
     "@types/chai": "^4.2.21",
