@@ -1,0 +1,9 @@
+subgraphs:
+  userMeta:
+    routing_url: https://mysite.com/user-meta/graphql
+    schema:
+      subgraph_url: https://mysite.com/user-meta/graphql
+  spacex:
+    routing_url: https://api.spacex.land/graphql/
+    schema:
+      subgraph_url: https://api.spacex.land/graphql/
