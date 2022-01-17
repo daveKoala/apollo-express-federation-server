@@ -15,16 +15,179 @@ directive @join__owner(graph: join__Graph!) on INTERFACE | OBJECT
 
 directive @join__type(graph: join__Graph!, key: join__FieldSet) repeatable on INTERFACE | OBJECT
 
+"""An Activity is a subcategory of Module"""
+type Activity {
+  _id: String
+  content: CMSContent
+  description: String
+  endDate: String @deprecated(reason: "Start and finish dates not relevant. The Cohort entity has a start/finish date")
+  imageUrl: String
+  startDate: String @deprecated(reason: "Start and finish dates not relevant. The Cohort entity has a start/finish date")
+  subtitle: String
+  title: String
+  type: String
+}
+
+union ActivityResult = Activity | Error401 | NotFound
+
+type CMSAsset {
+  _type: String
+  reference: String
+}
+
+"""
+A CMS block represents a type, E.g. Text, video, article and resources needed to populate that block type
+"""
+type CMSBlock {
+  asset: CMSAsset @deprecated(reason: "This was part of a solution that used Ghost")
+  blockType: String
+  imageUrl: String
+  text: String
+  url: String
+}
+
+"""CMS object"""
+type CMSContent {
+  _id: ID!
+
+  """The body is an array of blocks"""
+  body: [CMSBlock]
+  createdAt: String
+  updatedAt: String
+}
+
 type Error401 {
   message: String
 }
+
+type Goal
+  @join__owner(graph: GOALS)
+  @join__type(graph: GOALS, key: "_id")
+{
+  _id: ID! @join__field(graph: GOALS)
+  accomplishment: String @join__field(graph: GOALS)
+  ambition: String @join__field(graph: GOALS)
+  habits: [Habit] @join__field(graph: GOALS)
+  userId: String @join__field(graph: GOALS)
+}
+
+type Habit {
+  _id: ID!
+  barriers: String
+  enablers: String
+  goal: Goal
+  goalId: String
+  notification: Notification
+  practice: Int
+  practiceDates: [String]
+  reward: String
+  targetDate: String
+  title: String
+  trigger: String
+  userId: String
+  visualisation: String
+}
+
+type HabitBank {
+  _id: ID!
+  group: String
+  habits: [HabitBankItem]
+  icon: String
+  isDeleted: Boolean
+}
+
+type HabitBankItem {
+  _id: ID!
+  isDeleted: Boolean
+  title: String
+}
+
+"""
+A Journey (Learning Journey) is a collection of resources to guide and inform a Cohort of Users
+"""
+type Journey
+  @join__owner(graph: JOURNEY)
+  @join__type(graph: JOURNEY, key: "_id")
+{
+  _id: ID! @join__field(graph: JOURNEY)
+  endDate: String @deprecated(reason: "Start and finish dates not relevant. The Cohort entity has a start/finish date") @join__field(graph: JOURNEY)
+  modules: [ModuleResult] @join__field(graph: JOURNEY)
+  organizationId: String @join__field(graph: JOURNEY)
+  programme: ProgrammeResult @join__field(graph: JOURNEY)
+  published: Boolean @join__field(graph: JOURNEY)
+  startDate: String @deprecated(reason: "Start and finish dates not relevant. The Cohort entity has a start/finish date") @join__field(graph: JOURNEY)
+  subtitle: String @join__field(graph: JOURNEY)
+  title: String @join__field(graph: JOURNEY)
+}
+
+union JourneyResult = Error401 | Journey | NotFound
+
+"""A Module is a subcategory of Journey"""
+type Module {
+  _id: ID!
+  active: Boolean
+  activities: [ActivityResult]
+  endDate: String @deprecated(reason: "Start and finish dates not relevant. The Cohort entity has a start/finish date")
+  imageUrl: String
+  isVisible: Boolean
+  organizationId: String
+  startDate: String @deprecated(reason: "Start and finish dates not relevant. The Cohort entity has a start/finish date")
+  subtitle: String
+  title: String
+}
+
+union ModuleResult = Error401 | Module | NotFound
 
 type NotFound {
   message: String
 }
 
+type Notification {
+  day: [String]
+  isOff: Boolean
+  time: String
+}
+
+"""
+A Programme is a collection of Journeys. Programme 'Better Listening' could have multiple versions or different journeys
+"""
+type Programme
+  @join__owner(graph: JOURNEY)
+  @join__type(graph: JOURNEY, key: "_id")
+{
+  _id: ID! @join__field(graph: JOURNEY)
+  journeys: [JourneyResult] @join__field(graph: JOURNEY)
+  name: String @join__field(graph: JOURNEY)
+  organisation: String @join__field(graph: JOURNEY)
+}
+
+union ProgrammeResult = Error401 | NotFound | Programme
+
 type Query {
   UserMeta(userId: ID!): UserMetaResult @join__field(graph: USERMETA)
+
+  """Fetch an Activity by its ID"""
+  activity(id: ID!): ActivityResult @join__field(graph: JOURNEY)
+  goal(id: ID!): Goal @join__field(graph: GOALS)
+  goals: [Goal] @join__field(graph: GOALS)
+  habit(id: ID!): Habit @join__field(graph: GOALS)
+  habitBank(includeDeleted: Boolean): [HabitBank] @join__field(graph: GOALS)
+  habits: [Habit] @join__field(graph: GOALS)
+
+  """Fetch a Journey by its ID"""
+  journey(id: ID!): JourneyResult @join__field(graph: JOURNEY)
+
+  """Fetch all Journeys in the database"""
+  journeys: [JourneyResult] @join__field(graph: JOURNEY)
+
+  """Fetch a Module by its ID"""
+  module(id: ID!): ModuleResult @join__field(graph: JOURNEY)
+
+  """Fetch a Programme by its ID"""
+  programme(id: ID!): ProgrammeResult @join__field(graph: JOURNEY)
+
+  """Fetch all Programmes in the database"""
+  programmes: [ProgrammeResult] @join__field(graph: JOURNEY)
 }
 
 type UserMeta
@@ -60,5 +223,7 @@ enum core__Purpose {
 scalar join__FieldSet
 
 enum join__Graph {
+  GOALS @join__graph(name: "goals" url: "https://test-strata2-api.cirrus-connect.com/goal/graphql")
+  JOURNEY @join__graph(name: "journey" url: "https://test-strata2-api.cirrus-connect.com/journey/graphql")
   USERMETA @join__graph(name: "userMeta" url: "https://test-strata2-api.cirrus-connect.com/user-meta/graphql")
 }

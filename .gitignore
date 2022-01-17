@@ -8,3 +8,4 @@ resources/
 
 **/supergraph-config.yaml
 
+app/src/supergraph.graphql

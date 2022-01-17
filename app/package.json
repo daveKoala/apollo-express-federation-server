@@ -13,7 +13,7 @@
     "audit": "better-npm-audit audit",
     "test:local": "mocha -r ts-node/register './src/**/*.spec.ts'",
     "test": "mocha -r ts-node/register './src/**/*.spec.ts' --config=./.mocharc.publish.js",
-    "composeSchema": "rover supergraph compose --config ./supergraph-config.yaml"
+    "composeSchema": "rover supergraph compose --config ./supergraph-config.yaml > ./src/supergraph.graphql"
   },
   "keywords": [],
   "author": "",
