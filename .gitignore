@@ -6,6 +6,7 @@ resources/
 
 **/.env
 
-**/supergraph-config.yaml
+app/src/supergraph-config.yaml
+
 
 app/src/supergraph.graphql
