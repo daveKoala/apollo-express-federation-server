@@ -11,3 +11,4 @@ app/src/supergraph-config.yaml
 
 app/src/supergraph.graphql
 app/supergraph-config.yaml
+app/supergraph-config-*.yaml
